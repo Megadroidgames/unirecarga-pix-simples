@@ -1,8 +1,4 @@
-{
-type: uploaded file
-fileName: megadroidgames/unirecarga-pix-simples/unirecarga-pix-simples-1b6c0eb0622160fd686538019a7772512c01c312/src/components/CheckoutModal.tsx
-fullContent:
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { ArrowLeft, Copy, Check, Mail, Phone } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -17,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Product } from "@/data/products";
 import { useToast } from "@/hooks/use-toast";
-import { generatePixPayload } from "@/lib/utils";
 
 interface CheckoutModalProps {
   product: Product | null;
@@ -25,28 +20,14 @@ interface CheckoutModalProps {
   onClose: () => void;
 }
 
-// Configurações da sua Chave Pix
-const PIX_KEY_ID = "4578492e-ccc6-4e03-8bd4-49643647d5b95";
-const MERCHANT_NAME = "Unirecarga"; // Nome que aparecerá no banco
-const MERCHANT_CITY = "Online";     // Cidade
+const PIX_KEY =
+"00020126580014BR.GOV.BCB.PIX01364578492e-ccc6-4e03-8bd4-49643647d5b95204000053039865802BR5901N6001C62070503***6304C964";
 
 const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
   const [step, setStep] = useState<1 | 2>(1);
   const [contact, setContact] = useState("");
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
-
-  // Gera o código Pix dinamicamente com base no produto selecionado
-  const pixCode = useMemo(() => {
-    if (!product) return "";
-    return generatePixPayload({
-      key: PIX_KEY_ID,
-      name: MERCHANT_NAME,
-      city: MERCHANT_CITY,
-      amount: product.price,
-      txid: "***", // Identificador da transação (opcional)
-    });
-  }, [product]);
 
   const handleClose = () => {
     setStep(1);
@@ -68,7 +49,7 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
   };
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(pixCode);
+    await navigator.clipboard.writeText(PIX_KEY);
     setCopied(true);
     toast({ title: "Código PIX copiado!" });
     setTimeout(() => setCopied(false), 3000);
@@ -150,7 +131,7 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
             </div>
 
             <div className="flex justify-center rounded-xl bg-white p-6">
-              <QRCodeSVG value={pixCode} size={200} level="M" />
+              <QRCodeSVG value={PIX_KEY} size={200} level="M" />
             </div>
 
             <div className="space-y-2">
@@ -158,7 +139,7 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
               <div className="flex gap-2">
                 <Input
                 readOnly
-                value={pixCode}
+                value={PIX_KEY}
                 className="bg-secondary border-border text-xs" />
 
                 <Button
@@ -187,4 +168,3 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
 };
 
 export default CheckoutModal;
-}
