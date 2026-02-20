@@ -11,14 +11,14 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, onBuy }: ProductCardProps) => {
   return (
-    <Card className="group relative overflow-hidden border-border bg-card transition-all hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 active:scale-[0.98] touch-manipulation">
+    <Card className="group relative overflow-hidden border-border bg-card transition-all hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5">
       {product.isCombo && (
         <Badge className="absolute right-3 top-3 z-10 bg-[hsl(var(--combo))] text-[hsl(var(--combo-foreground))] border-0 font-bold text-xs">
           🔥 Combo!
         </Badge>
       )}
 
-      <div className="relative h-32 overflow-hidden sm:h-40">
+      <div className="relative h-40 overflow-hidden">
         <img
           src={product.image}
           alt={product.name}
@@ -33,26 +33,26 @@ const ProductCard = ({ product, onBuy }: ProductCardProps) => {
         </div>
       </div>
 
-      <CardContent className="space-y-3 p-3 sm:p-4">
+      <CardContent className="space-y-3 p-4">
         <div>
-          <h3 className="text-sm font-semibold text-foreground sm:text-base">{product.name}</h3>
+          <h3 className="font-semibold text-foreground">{product.name}</h3>
           <p className="text-xs text-muted-foreground">{product.duration}</p>
         </div>
 
         <div className="flex items-end gap-2">
           {product.originalPrice && (
-            <span className="text-xs text-muted-foreground line-through sm:text-sm">
+            <span className="text-sm text-muted-foreground line-through">
               R$ {product.originalPrice.toFixed(2).replace(".", ",")}
             </span>
           )}
-          <span className="text-lg font-bold text-[hsl(var(--accent))] sm:text-xl">
+          <span className="text-xl font-bold text-[hsl(var(--accent))]">
             R$ {product.price.toFixed(2).replace(".", ",")}
           </span>
         </div>
 
         <Button
           onClick={() => onBuy(product)}
-          className="w-full gap-2 font-semibold touch-manipulation"
+          className="w-full gap-2 font-semibold"
           size="lg"
         >
           <ShoppingCart className="h-4 w-4" />

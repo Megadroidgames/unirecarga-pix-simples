@@ -2,25 +2,17 @@ import { useState } from "react";
 import { ArrowLeft, Copy, Check, Mail, Phone } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-} from "@/components/ui/drawer";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+  DialogDescription } from
+"@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Product } from "@/data/products";
 import { useToast } from "@/hooks/use-toast";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CheckoutModalProps {
   product: Product | null;
@@ -29,14 +21,13 @@ interface CheckoutModalProps {
 }
 
 const PIX_KEY =
-  "00020126580014BR.GOV.BCB.PIX01364578492e-ccc6-4e03-8bd4-49643647d5b95204000053039865802BR5901N6001C62070503***6304C964";
+"00020126580014BR.GOV.BCB.PIX01364578492e-ccc6-4e03-8bd4-49643647d5b95204000053039865802BR5901N6001C62070503***6304C964";
 
 const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
   const [step, setStep] = useState<1 | 2>(1);
   const [contact, setContact] = useState("");
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
-  const isMobile = useIsMobile();
 
   const handleClose = () => {
     setStep(1);
@@ -50,7 +41,7 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
       toast({
         title: "Campo obrigatório",
         description: "Informe seu WhatsApp ou Email para continuar.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
@@ -66,149 +57,114 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
 
   if (!product) return null;
 
-  const content = (
-    <div className="space-y-4">
-      {step === 1 ? (
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-md border-border bg-card sm:rounded-xl">
+        {step === 1 ?
         <>
-          <div className="rounded-lg bg-secondary p-4">
-            <p className="font-semibold text-foreground">{product.name}</p>
-            <p className="text-sm text-muted-foreground">{product.duration}</p>
-            <p className="mt-1 text-lg font-bold text-[hsl(var(--accent))]">
-              R$ {product.price.toFixed(2).replace(".", ",")}
-            </p>
-          </div>
+            <DialogHeader>
+              <DialogTitle className="text-foreground">Finalizar Compra</DialogTitle>
+              <DialogDescription>
+                Informe como deseja receber o código de resgate.
+              </DialogDescription>
+            </DialogHeader>
 
-          <div className="space-y-2">
-            <Label htmlFor="contact" className="text-foreground">
-              WhatsApp ou Email
-            </Label>
-            <div className="relative">
-              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                {contact.includes("@") ? (
-                  <Mail className="h-4 w-4" />
-                ) : (
-                  <Phone className="h-4 w-4" />
-                )}
-              </div>
-              <Input
+            <div className="rounded-lg bg-secondary p-4">
+              <p className="font-semibold text-foreground">{product.name}</p>
+              <p className="text-sm text-muted-foreground">{product.duration}</p>
+              <p className="mt-1 text-lg font-bold text-[hsl(var(--accent))]">
+                R$ {product.price.toFixed(2).replace(".", ",")}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contact" className="text-foreground">
+                WhatsApp ou Email
+              </Label>
+              <div className="relative">
+                <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  {contact.includes("@") ?
+                <Mail className="h-4 w-4" /> :
+
+                <Phone className="h-4 w-4" />
+                }
+                </div>
+                <Input
                 id="contact"
                 placeholder="(11) 99999-9999 ou email@exemplo.com"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                className="bg-secondary border-border pl-9 h-12 text-base"
-              />
+                className="bg-secondary border-border pl-9" />
+
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Enviaremos o código de resgate para esse contato.
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Enviaremos o código de resgate para esse contato.
-            </p>
-          </div>
 
-          <Button
-            onClick={handleNext}
-            className="w-full font-semibold h-12 text-base touch-manipulation"
-            size="lg"
-          >
-            Próximo
-          </Button>
-        </>
-      ) : (
+            <Button onClick={handleNext} className="w-full font-semibold" size="lg">
+              Próximo
+            </Button>
+          </> :
+
         <>
-          <div className="rounded-lg bg-secondary p-4 text-center">
-            <p className="mb-1 text-sm text-muted-foreground">Valor a pagar</p>
-            <p className="text-3xl font-bold text-[hsl(var(--accent))]">
-              R$ {product.price.toFixed(2).replace(".", ",")}
-            </p>
-          </div>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-foreground">
+                <button
+                onClick={() => setStep(1)}
+                className="rounded-md p-1 hover:bg-secondary">
 
-          <div className="flex justify-center rounded-xl bg-white p-4 sm:p-6">
-            <QRCodeSVG value={PIX_KEY} size={isMobile ? 180 : 200} level="M" />
-          </div>
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+                Pagamento via PIX
+              </DialogTitle>
+              <DialogDescription>
+                Escaneie o QR Code ou copie o código para pagar.
+              </DialogDescription>
+            </DialogHeader>
 
-          <div className="space-y-2">
-            <Label className="text-foreground">Código PIX (copia e cola)</Label>
-            <div className="flex gap-2">
-              <Input
+            <div className="rounded-lg bg-secondary p-4 text-center">
+              <p className="mb-1 text-sm text-muted-foreground">Valor a pagar</p>
+              <p className="text-3xl font-bold text-[hsl(var(--accent))]">
+                R$ {product.price.toFixed(2).replace(".", ",")}
+              </p>
+            </div>
+
+            <div className="flex justify-center rounded-xl bg-white p-6">
+              <QRCodeSVG value={PIX_KEY} size={200} level="M" />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-foreground">Código PIX (copia e cola)</Label>
+              <div className="flex gap-2">
+                <Input
                 readOnly
                 value={PIX_KEY}
-                className="bg-secondary border-border text-xs"
-              />
-              <Button
+                className="bg-secondary border-border text-xs" />
+
+                <Button
                 variant="outline"
                 size="icon"
                 onClick={handleCopy}
-                className="shrink-0 border-border h-10 w-10 touch-manipulation"
-              >
-                {copied ? (
-                  <Check className="h-4 w-4 text-[hsl(var(--accent))]" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
+                className="shrink-0 border-border">
+
+                  {copied ?
+                <Check className="h-4 w-4 text-[hsl(var(--accent))]" /> :
+
+                <Copy className="h-4 w-4" />
+                }
+                </Button>
+              </div>
             </div>
-          </div>
 
-          <p className="text-center text-xs text-muted-foreground">
-            Após o pagamento, o código será enviado automaticamente para o seu
-            WhatsApp ou e-mail.
+            <p className="text-center text-xs text-muted-foreground">Após o pagamento, o código será enviado automaticamente para o seu WhatsApp ou e-mail. Certifique-se de que os dados foram digitados corretamente.
+
           </p>
-        </>
-      )}
-    </div>
-  );
-
-  if (isMobile) {
-    return (
-      <Drawer open={open} onOpenChange={handleClose}>
-        <DrawerContent className="border-border bg-card px-4 pb-8">
-          <DrawerHeader className="px-0 pt-4">
-            <DrawerTitle className="flex items-center gap-2 text-foreground">
-              {step === 2 && (
-                <button
-                  onClick={() => setStep(1)}
-                  className="rounded-md p-1 hover:bg-secondary touch-manipulation"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </button>
-              )}
-              {step === 1 ? "Finalizar Compra" : "Pagamento via PIX"}
-            </DrawerTitle>
-            <DrawerDescription>
-              {step === 1
-                ? "Informe como deseja receber o código de resgate."
-                : "Escaneie o QR Code ou copie o código para pagar."}
-            </DrawerDescription>
-          </DrawerHeader>
-          {content}
-        </DrawerContent>
-      </Drawer>
-    );
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md border-border bg-card sm:rounded-xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-foreground">
-            {step === 2 && (
-              <button
-                onClick={() => setStep(1)}
-                className="rounded-md p-1 hover:bg-secondary"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </button>
-            )}
-            {step === 1 ? "Finalizar Compra" : "Pagamento via PIX"}
-          </DialogTitle>
-          <DialogDescription>
-            {step === 1
-              ? "Informe como deseja receber o código de resgate."
-              : "Escaneie o QR Code ou copie o código para pagar."}
-          </DialogDescription>
-        </DialogHeader>
-        {content}
+          </>
+        }
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>);
+
 };
 
 export default CheckoutModal;
