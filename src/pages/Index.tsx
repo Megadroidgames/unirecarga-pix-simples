@@ -23,21 +23,21 @@ const Index = () => {
     <div className="min-h-screen flex flex-col">
       <Header search={search} onSearchChange={setSearch} />
 
-      <main className="container mx-auto flex-1 px-4 py-8">
-        <section className="mb-8 text-center">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+      <main className="container mx-auto flex-1 px-4 py-6 sm:py-8">
+        <section className="mb-6 text-center sm:mb-8">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-4xl">
             Recarregue suas <span className="text-primary">assinaturas</span>
           </h2>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-2 text-sm text-muted-foreground sm:text-base">
             Escolha seu plano, pague via PIX e receba seu código na hora.
           </p>
         </section>
 
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <CategoryFilter selected={category} onSelect={setCategory} />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4">
           {filtered.map((product) => (
             <ProductCard
               key={product.id}
