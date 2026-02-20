@@ -20,55 +20,46 @@ interface CheckoutModalProps {
   onClose: () => void;
 }
 
-// --- FUNÇÕES DE UTILIDADE PARA PIX DINÂMICO ---
+// --- FUNÇÕES DE SEGURANÇA E FORMATAÇÃO DO PIX ---
 
-/**
- * Calcula o CRC16 (CCITT-FALSE) necessário para validar o PIX em bancos como Santander/Itaú.
- */
+// 1. Função Matemática Rigorosa para o Checksum (CRC16-CCITT)
 const calculateCRC16 = (payload: string): string => {
-  let result = 0xFFFF;
-  for (let i = 0; i < payload.length; i++) {
-    result ^= payload.charCodeAt(i) << 8;
-    for (let j = 0; j < 8; j++) {
-      if ((result & 0x8000) !== 0) {
-        result = (result << 1) ^ 0x1021;
+  let crc = 0xFFFF;
+  for (let c = 0; c < payload.length; c++) {
+    crc ^= payload.charCodeAt(c) << 8;
+    for (let i = 0; i < 8; i++) {
+      if (crc & 0x8000) {
+        crc = ((crc << 1) ^ 0x1021) & 0xFFFF; // Adicionado & 0xFFFF para segurança extra no JS
       } else {
-        result <<= 1;
+        crc = (crc << 1) & 0xFFFF;
       }
     }
   }
-  return (result & 0xFFFF).toString(16).toUpperCase().padStart(4, "0");
+  return crc.toString(16).toUpperCase().padStart(4, "0");
 };
 
-/**
- * Monta a string PIX Copia e Cola com base no preço do produto.
- */
+// 2. Montagem do PIX usando a sua Base Perfeita
 const generateDynamicPix = (price: number) => {
-  // Configurações da sua conta (ajuste se necessário)
-  const key = "4578492e-ccc6-4e03-8bd4-49643647d5b9"; // Sua chave
-  const name = "N"; // Nome do beneficiário (curto para evitar erros de tamanho)
-  const city = "C"; // Cidade do beneficiário
-
-  // Montagem do Payload (Padrão EMV Co-branded)
-  const part1 = "000201"; // Payload Format Indicator
-  const merchantAccount = `26${(14 + 4 + key.length).toString().padStart(2, "0")}0014BR.GOV.BCB.PIX01${key.length.toString().padStart(2, "0")}${key}`;
-  const merchantCategory = "52040000";
-  const currency = "5303986"; // BRL
-
-  // Valor: Tag 54 + Tamanho + Valor Formatado (ex: 10.00)
-  const amountStr = price.toFixed(2);
-  const amountTag = `54${amountStr.length.toString().padStart(2, "0")}${amountStr}`;
-
-  const country = "5802BR";
-  const merchantName = `59${name.length.toString().padStart(2, "0")}${name}`;
-  const merchantCity = `60${city.length.toString().padStart(2, "0")}${city}`;
-  const additionalData = "62070503***";
-  const crcHeader = "6304";
-
-  const fullPayload = `${part1}${merchantAccount}${merchantCategory}${currency}${amountTag}${country}${merchantName}${merchantCity}${additionalData}${crcHeader}`;
+  // Parte 1 da sua string original (Até a tag da Moeda BRL: 53 03 986)
+  const part1 = "00020126580014BR.GOV.BCB.PIX01364578492e-ccc6-4e03-8bd4-49643647d5b9520400005303986";
   
-  const crcFinal = calculateCRC16(fullPayload);
-  return `${fullPayload}${crcFinal}`;
+  // Parte 2 da sua string original (Do País BR até a tag do CRC: 58 02 BR ... 63 04)
+  const part2 = "5802BR5901N6001C62070503***6304";
+  
+  // Formatamos o valor exato (ex: 15.50)
+  const amountStr = price.toFixed(2);
+  
+  // Criamos a Tag 54 (Valor): "54" + Tamanho da string do valor + O Valor
+  const amountTag = `54${amountStr.length.toString().padStart(2, "0")}${amountStr}`;
+  
+  // Juntamos tudo ANTES de calcular o código de segurança
+  const payloadBeforeCrc = `${part1}${amountTag}${part2}`;
+  
+  // Calculamos a nova assinatura baseada no texto com o valor
+  const newCrc = calculateCRC16(payloadBeforeCrc);
+  
+  // Retornamos a string final pronta
+  return `${payloadBeforeCrc}${newCrc}`;
 };
 
 // --- COMPONENTE PRINCIPAL ---
@@ -79,7 +70,7 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
-  // Gera o código PIX apenas quando o produto ou o preço mudam
+  // O código PIX é recalculado apenas quando o produto muda
   const currentPixCode = useMemo(() => {
     if (!product) return "";
     return generateDynamicPix(product.price);
