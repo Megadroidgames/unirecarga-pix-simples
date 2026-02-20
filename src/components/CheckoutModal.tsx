@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ArrowLeft, Copy, Check, Mail, Phone } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -20,12 +20,58 @@ interface CheckoutModalProps {
   onClose: () => void;
 }
 
-// 1. Chave e Configurações base
-const PIX_CONFIG = {
-  key: "4578492e-ccc6-4e03-8bd4-49643647d5b9", // Sua chave PIX aqui
-  name: "NOME DO RECEBEDOR",
-  city: "SAO PAULO",
+// --- FUNÇÕES DE UTILIDADE PARA PIX DINÂMICO ---
+
+/**
+ * Calcula o CRC16 (CCITT-FALSE) necessário para validar o PIX em bancos como Santander/Itaú.
+ */
+const calculateCRC16 = (payload: string): string => {
+  let result = 0xFFFF;
+  for (let i = 0; i < payload.length; i++) {
+    result ^= payload.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      if ((result & 0x8000) !== 0) {
+        result = (result << 1) ^ 0x1021;
+      } else {
+        result <<= 1;
+      }
+    }
+  }
+  return (result & 0xFFFF).toString(16).toUpperCase().padStart(4, "0");
 };
+
+/**
+ * Monta a string PIX Copia e Cola com base no preço do produto.
+ */
+const generateDynamicPix = (price: number) => {
+  // Configurações da sua conta (ajuste se necessário)
+  const key = "4578492e-ccc6-4e03-8bd4-49643647d5b9"; // Sua chave
+  const name = "N"; // Nome do beneficiário (curto para evitar erros de tamanho)
+  const city = "C"; // Cidade do beneficiário
+
+  // Montagem do Payload (Padrão EMV Co-branded)
+  const part1 = "000201"; // Payload Format Indicator
+  const merchantAccount = `26${(14 + 4 + key.length).toString().padStart(2, "0")}0014BR.GOV.BCB.PIX01${key.length.toString().padStart(2, "0")}${key}`;
+  const merchantCategory = "52040000";
+  const currency = "5303986"; // BRL
+
+  // Valor: Tag 54 + Tamanho + Valor Formatado (ex: 10.00)
+  const amountStr = price.toFixed(2);
+  const amountTag = `54${amountStr.length.toString().padStart(2, "0")}${amountStr}`;
+
+  const country = "5802BR";
+  const merchantName = `59${name.length.toString().padStart(2, "0")}${name}`;
+  const merchantCity = `60${city.length.toString().padStart(2, "0")}${city}`;
+  const additionalData = "62070503***";
+  const crcHeader = "6304";
+
+  const fullPayload = `${part1}${merchantAccount}${merchantCategory}${currency}${amountTag}${country}${merchantName}${merchantCity}${additionalData}${crcHeader}`;
+  
+  const crcFinal = calculateCRC16(fullPayload);
+  return `${fullPayload}${crcFinal}`;
+};
+
+// --- COMPONENTE PRINCIPAL ---
 
 const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
   const [step, setStep] = useState<1 | 2>(1);
@@ -33,43 +79,11 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
-  // 2. Função para gerar o código PIX Estático com Valor Dinâmico
-  const generatePixCode = (price: number) => {
-    const amount = price.toFixed(2);
-    const amountLength = amount.length.toString().padStart(2, '0');
-    
-    // Payload simplificado seguindo o padrão BACEN
-    // Nota: Para um gerador 100% robusto em produção, recomenda-se uma lib como 'pix-payload-generator'
-    // Mas este modelo atende a estrutura estática básica:
-    const payload = [
-      "000201", // Payload Format Indicator
-      "26", "58", "0014BR.GOV.BCB.PIX", `01${PIX_CONFIG.key.length}${PIX_CONFIG.key}`, // Merchant Account Info
-      "52040000", // Merchant Category Code
-      "5303986", // Transaction Currency (986 = BRL)
-      `54${amountLength}${amount}`, // Transaction Amount (DINÂMICO)
-      "5802BR", // Country Code
-      `59${PIX_CONFIG.name.length.toString().padStart(2, '0')}${PIX_CONFIG.name}`, // Merchant Name
-      `60${PIX_CONFIG.city.length.toString().padStart(2, '0')}${PIX_CONFIG.city}`, // Merchant City
-      "62070503***", // Additional Data Field
-      "6304" // CRC16 (Início)
-    ].join("");
-
-    return payload; // Em um cenário real, você calcularia o CRC16 aqui. 
-    // DICA: Para fins estáticos simples, muitos apps aceitam a string sem o CRC final ou com ele fixo,
-    // mas o ideal é usar o valor que o seu banco gera e apenas trocar o campo '54' (valor).
-  };
-
-  // Se você já tem um código pronto do seu banco, cole ele aqui e usaremos a lógica de substituição:
-  const getDynamicPix = (price: number) => {
-    const baseCode = "00020126580014BR.GOV.BCB.PIX01364578492e-ccc6-4e03-8bd4-49643647d5b9520400005303986";
-    const amount = price.toFixed(2);
-    const amountTag = `54${amount.length.toString().padStart(2, '0')}${amount}`;
-    const restOfCode = "5802BR5901N6001C62070503***6304C964";
-    
-    return `${baseCode}${amountTag}${restOfCode}`;
-  };
-
-  const currentPixCode = product ? getDynamicPix(product.price) : "";
+  // Gera o código PIX apenas quando o produto ou o preço mudam
+  const currentPixCode = useMemo(() => {
+    if (!product) return "";
+    return generateDynamicPix(product.price);
+  }, [product]);
 
   const handleClose = () => {
     setStep(1);
@@ -91,10 +105,14 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
   };
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(currentPixCode);
-    setCopied(true);
-    toast({ title: "Código PIX copiado!" });
-    setTimeout(() => setCopied(false), 3000);
+    try {
+      await navigator.clipboard.writeText(currentPixCode);
+      setCopied(true);
+      toast({ title: "Código PIX copiado!" });
+      setTimeout(() => setCopied(false), 3000);
+    } catch (err) {
+      toast({ title: "Erro ao copiar", variant: "destructive" });
+    }
   };
 
   if (!product) return null;
@@ -125,7 +143,11 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
               </Label>
               <div className="relative">
                 <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  {contact.includes("@") ? <Mail className="h-4 w-4" /> : <Phone className="h-4 w-4" />}
+                  {contact.includes("@") ? (
+                    <Mail className="h-4 w-4" />
+                  ) : (
+                    <Phone className="h-4 w-4" />
+                  )}
                 </div>
                 <Input
                   id="contact"
@@ -145,7 +167,10 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-foreground">
-                <button onClick={() => setStep(1)} className="rounded-md p-1 hover:bg-secondary">
+                <button
+                  onClick={() => setStep(1)}
+                  className="rounded-md p-1 hover:bg-secondary transition-colors"
+                >
                   <ArrowLeft className="h-4 w-4" />
                 </button>
                 Pagamento via PIX
@@ -162,7 +187,7 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
               </p>
             </div>
 
-            <div className="flex justify-center rounded-xl bg-white p-6">
+            <div className="flex justify-center rounded-xl bg-white p-6 shadow-sm">
               <QRCodeSVG value={currentPixCode} size={200} level="M" />
             </div>
 
@@ -172,16 +197,25 @@ const CheckoutModal = ({ product, open, onClose }: CheckoutModalProps) => {
                 <Input
                   readOnly
                   value={currentPixCode}
-                  className="bg-secondary border-border text-xs"
+                  className="bg-secondary border-border text-xs focus-visible:ring-0"
                 />
-                <Button variant="outline" size="icon" onClick={handleCopy} className="shrink-0 border-border">
-                  {copied ? <Check className="h-4 w-4 text-[hsl(var(--accent))]" /> : <Copy className="h-4 w-4" />}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleCopy}
+                  className="shrink-0 border-border"
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
 
-            <p className="text-center text-xs text-muted-foreground">
-              Após o pagamento, o código será enviado automaticamente para o seu WhatsApp ou e-mail.
+            <p className="text-center text-[10px] leading-tight text-muted-foreground px-4">
+              Após o pagamento, o código será enviado para seu contato. Verifique se digitou corretamente.
             </p>
           </>
         )}
