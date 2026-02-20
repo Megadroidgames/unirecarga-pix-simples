@@ -1,12 +1,66 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useMemo } from "react";
+import Header from "@/components/Header";
+import CategoryFilter from "@/components/CategoryFilter";
+import ProductCard from "@/components/ProductCard";
+import CheckoutModal from "@/components/CheckoutModal";
+import Footer from "@/components/Footer";
+import { products, Product } from "@/data/products";
 
 const Index = () => {
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("Todos");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const filtered = useMemo(() => {
+    return products.filter((p) => {
+      const matchCat = category === "Todos" || p.category === category;
+      const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
+      return matchCat && matchSearch;
+    });
+  }, [search, category]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen flex flex-col">
+      <Header search={search} onSearchChange={setSearch} />
+
+      <main className="container mx-auto flex-1 px-4 py-8">
+        <section className="mb-8 text-center">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Recarregue suas <span className="text-primary">assinaturas</span>
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Escolha seu plano, pague via PIX e receba seu código na hora.
+          </p>
+        </section>
+
+        <div className="mb-8">
+          <CategoryFilter selected={category} onSelect={setCategory} />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filtered.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onBuy={setSelectedProduct}
+            />
+          ))}
+        </div>
+
+        {filtered.length === 0 && (
+          <p className="mt-12 text-center text-muted-foreground">
+            Nenhum produto encontrado.
+          </p>
+        )}
+      </main>
+
+      <Footer />
+
+      <CheckoutModal
+        product={selectedProduct}
+        open={!!selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+      />
     </div>
   );
 };
