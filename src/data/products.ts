@@ -37,7 +37,7 @@ export const products: Product[] = [
     price: 90.0,
     originalPrice: 139.99,
     isCombo: true,
-    image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&h=300&fit=crop",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjiC3hrj9gxzZv1BVFbL3t8O_novDtpyzfjG5E1lqwOSU_hsurbuxctljgbIHGn6jvE65o7sd5fWF3ygOLhe_b5rR7QO9ik_cboTnk2T7RaUQ-jl9EGS_bFw9ASHdT-Mocs_zqlnr46kavxgx1SdhYRb9-lJRwoK9Fm93SbxrmioHWKT1y3rV-bOS8VqGE/s320/Design%20sem%20nome%20(1).png",
   },
   // UniTv
   {
@@ -47,7 +47,7 @@ export const products: Product[] = [
     duration: "30 Dias",
     price: 15.0,
     originalPrice: 19.99,
-    image: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=400&h=300&fit=crop",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi1oCm4Yn0jeXkxub6mwq7VG2iVJZiIxAVzG4-0Yl5ZQZBR8X2cvY8SQV8ai_s8tybwaVgYxRAFVl3NA6-DgpXiZZlITrhDiIou-dCOplnQfrBFx32v5czV48PJsCl6FxmCCF1JepcUQOB8P8tAZ03rs_-xxfr8uaQHJAP-BH-tJiVRv-qAscsGc4gmdaQ/s320/Design%20sem%20nome%20(6).png",
   },
   {
     id: "unitv-90d",
@@ -57,7 +57,7 @@ export const products: Product[] = [
     price: 40.0,
     originalPrice: 54.99,
     isCombo: true,
-    image: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=400&h=300&fit=crop",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi1oCm4Yn0jeXkxub6mwq7VG2iVJZiIxAVzG4-0Yl5ZQZBR8X2cvY8SQV8ai_s8tybwaVgYxRAFVl3NA6-DgpXiZZlITrhDiIou-dCOplnQfrBFx32v5czV48PJsCl6FxmCCF1JepcUQOB8P8tAZ03rs_-xxfr8uaQHJAP-BH-tJiVRv-qAscsGc4gmdaQ/s320/Design%20sem%20nome%20(6).png",
   },
   {
     id: "unitv-180d",
@@ -67,7 +67,7 @@ export const products: Product[] = [
     price: 80.0,
     originalPrice: 109.99,
     isCombo: true,
-    image: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=400&h=300&fit=crop",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi1oCm4Yn0jeXkxub6mwq7VG2iVJZiIxAVzG4-0Yl5ZQZBR8X2cvY8SQV8ai_s8tybwaVgYxRAFVl3NA6-DgpXiZZlITrhDiIou-dCOplnQfrBFx32v5czV48PJsCl6FxmCCF1JepcUQOB8P8tAZ03rs_-xxfr8uaQHJAP-BH-tJiVRv-qAscsGc4gmdaQ/s320/Design%20sem%20nome%20(6).png",
   },
   {
     id: "unitv-365d",
@@ -77,7 +77,7 @@ export const products: Product[] = [
     price: 100.0,
     originalPrice: 159.99,
     isCombo: true,
-    image: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=400&h=300&fit=crop",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi1oCm4Yn0jeXkxub6mwq7VG2iVJZiIxAVzG4-0Yl5ZQZBR8X2cvY8SQV8ai_s8tybwaVgYxRAFVl3NA6-DgpXiZZlITrhDiIou-dCOplnQfrBFx32v5czV48PJsCl6FxmCCF1JepcUQOB8P8tAZ03rs_-xxfr8uaQHJAP-BH-tJiVRv-qAscsGc4gmdaQ/s320/Design%20sem%20nome%20(6).png",
   },
   // CineDuo
   {
@@ -88,7 +88,7 @@ export const products: Product[] = [
     price: 99.99,
     originalPrice: 149.99,
     isCombo: true,
-    image: "https://images.unsplash.com/photo-1574375927938-d5a98e8d6f2b?w=400&h=300&fit=crop",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgkg2AJBROk5k89kOilsLgkuzamZw0QcDf_ZeaMBMOLCqA2Z_3sJuUjf5BVPUH293tz6-Ac1fCdw8Fc-PFKdbe-2NHh8W0CAMdLqElqUFeQnnIZzAIpB5vrYcDx-gM6vOQF_1t_0nlgbf3HC9tcT1H5zLk0Lccpp_70PgFg8z01Y-6FfTPV5A1UeLYJg28/s320/Design%20sem%20nome%20(3).png",
   },
   // OnPix Tv
   {
@@ -98,7 +98,7 @@ export const products: Product[] = [
     duration: "30 Dias",
     price: 10.0,
     originalPrice: 14.99,
-    image: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400&h=300&fit=crop",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjzjGiqVzOehOp8N46WMOgWTk0GgPxnltkGNX5z5qKDDVzbNfFLciW2mr-P5LiMdQ38dRJ_D_kPtgppUDwhXpnBHWaeucuO8DVwwCIeyhU3Sx4KaSNLb2kjLQhyj2nBT78_GXsJ-euAfaXiqaSmssTrqa6ooeqjozook6uwl94kfGQNBM4mXvhLikNs9Ro/s320/Design%20sem%20nome%20(4).png",
   },
   {
     id: "onpix-365d",
@@ -108,7 +108,7 @@ export const products: Product[] = [
     price: 99.99,
     originalPrice: 149.99,
     isCombo: true,
-    image: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400&h=300&fit=crop",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjzjGiqVzOehOp8N46WMOgWTk0GgPxnltkGNX5z5qKDDVzbNfFLciW2mr-P5LiMdQ38dRJ_D_kPtgppUDwhXpnBHWaeucuO8DVwwCIeyhU3Sx4KaSNLb2kjLQhyj2nBT78_GXsJ-euAfaXiqaSmssTrqa6ooeqjozook6uwl94kfGQNBM4mXvhLikNs9Ro/s320/Design%20sem%20nome%20(4).png",
   },
   // LuaTv
   {
@@ -119,6 +119,6 @@ export const products: Product[] = [
     price: 51.99,
     originalPrice: 74.99,
     isCombo: true,
-    image: "https://images.unsplash.com/photo-1586899028174-e7098604235b?w=400&h=300&fit=crop",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg01mqTGJ5QaaJ-UrH_fo1EABYGuW0EAChobMJnBJiaDIkRfzna1-4Ejp5WBLAAuciOpj7rxEcHm6Fa_-olrdnRYCssKI2ALsYyeVKcH5X8mBO9pGALJlExreA6Q66J-9KBrB2HNNrz2Darw-GvQjJV18YnpgbDrElFcHyBJE1bKaHjdEJYMXxyZg2UVAA/s320/Design%20sem%20nome%20(5).png",
   },
 ];
